@@ -21,10 +21,10 @@
   english_words_for_names: 'todo'
   naming_conventions: true
 3:
-  lines_per_method: 6
+  lines_per_method: 5
   line_length: 90
   max_nesting_depth: 2
-  methods_per_class: 12
+  methods_per_class: 11
   no_semicolons: true
   no_trailing_whitespace: true
   check_syntax: true
@@ -32,10 +32,10 @@
   english_words_for_names: 'rasterize rasterization renderer renderers html ascii eql bresenham vertices'
   naming_conventions: true
 4:
-  lines_per_method: 8
-  line_length: 90
-  max_nesting_depth: 3
-  methods_per_class: 8
+  lines_per_method: 5
+  line_length: 80
+  max_nesting_depth: 2
+  methods_per_class: 7
   no_semicolons: true
   no_trailing_whitespace: true
   check_syntax: true
