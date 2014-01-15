@@ -60,9 +60,7 @@ module Asm
 
     JUMPS.each do |jump_name, check|
       define_method jump_name do |target|
-        @commands << -> do
-          check.call ? @labels[target] : @instruction_pointer + 1
-        end
+        add_command target, check
       end
     end
 
@@ -95,6 +93,14 @@ module Asm
 
     def self.compile(&block)
       new.tap { |environment| environment.instance_eval(&block) }
+    end
+
+    private
+
+    def add_command(target, check)
+      @commands << -> do
+        check.call ? @labels[target] : @instruction_pointer + 1
+      end
     end
   end
 
