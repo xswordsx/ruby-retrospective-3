@@ -50,17 +50,13 @@ module Asm
 
     REGISTER_ACTIONS.each do |register_action|
       define_method register_action do |target, value = nil|
-        @commands << -> do
-          target.send register_action, value
-
-          @instruction_pointer + 1
-        end
+        queue_operation target, register_action, value
       end
     end
 
     JUMPS.each do |jump_name, check|
       define_method jump_name do |target|
-        add_command target, check
+        queue_jump target, check
       end
     end
 
@@ -97,9 +93,17 @@ module Asm
 
     private
 
-    def add_command(target, check)
+    def queue_jump(target, check)
       @commands << -> do
         check.call ? @labels[target] : @instruction_pointer + 1
+      end
+    end
+
+    def queue_operation(target, register_action, value)
+      @commands << -> do
+        target.send register_action, value
+
+        @instruction_pointer + 1
       end
     end
   end
