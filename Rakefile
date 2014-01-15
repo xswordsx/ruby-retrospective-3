@@ -11,7 +11,7 @@ end
 
 desc 'Starts watchr'
 task :watch do
-  system 'watchr watchr.rb'
+  system 'bundle exec watchr watchr.rb'
 end
 
 namespace :tasks do
@@ -27,7 +27,7 @@ namespace :tasks do
 
   task :spec, :task_id do |t, arg|
     index = arg
-    system("rspec --require ./solutions/#{index}.rb --fail-fast --color specs/#{index}_spec.rb") or exit(1)
+    system("bundle exec rspec --require ./solutions/#{index}.rb --fail-fast --color specs/#{index}_spec.rb") or exit(1)
   end
 
   task :skeptic, :task_id do |t, arg|
@@ -37,6 +37,6 @@ namespace :tasks do
       .map { |key, value| "--#{key.tr('_', '-')} #{value}".strip }
       .join(' ')
 
-    system("skeptic #{opts} solutions/#{'%02d' % index}.rb") or exit(1)
+    system("bundle exec skeptic #{opts} solutions/#{'%02d' % index}.rb") or exit(1)
   end
 end
