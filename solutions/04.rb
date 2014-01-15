@@ -6,26 +6,26 @@ module Asm
       @value = 0
     end
 
-    def mov(src)
-      @value = get_value(src)
+    def mov(source)
+      @value = get_value(source)
     end
 
-    def inc(src)
-      @value += get_value(src || 1)
+    def inc(source)
+      @value += get_value(source || 1)
     end
 
-    def dec(src)
-      @value -= get_value(src || 1)
+    def dec(source)
+      @value -= get_value(source || 1)
     end
 
-    def cmp(src)
-      self.class.flag_register_value = @value <=> get_value(src)
+    def cmp(source)
+      self.class.flag_register_value = @value <=> get_value(source)
     end
 
     private
 
-    def get_value(src)
-      src.is_a?(self.class) ? src.value : src
+    def get_value(source)
+      source.is_a?(self.class) ? source.value : source
     end
 
     class << self
@@ -73,8 +73,8 @@ module Asm
       @registers = Hash.new { |hash, key| hash[key] = Register.new }
     end
 
-    def label(dest)
-      @labels[dest] = @commands.length
+    def label(destination)
+      @labels[destination] = @commands.length
     end
 
     def method_missing(name, *args, &block)
