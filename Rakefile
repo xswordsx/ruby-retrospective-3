@@ -32,11 +32,18 @@ namespace :tasks do
 
   task :skeptic, :task_id do |t, arg|
     index = arg.to_i
-    opts = YAML.load_file('skeptic.yml')[index]
-      .map { |key, value| [key, (value == true ? nil : value)].compact }
-      .map { |key, value| "--#{key.tr('_', '-')} #{value}".strip }
-      .join(' ')
 
-    system("bundle exec skeptic #{opts} solutions/#{'%02d' % index}.rb") or exit(1)
+    opts = YAML.load_file('skeptic.yml')[index].map do |setting, value|
+      option_name = setting.to_s.tr('_', '-')
+      option      = "--#{option_name}"
+
+      case value
+      when false then nil
+      when true  then option
+      else       "#{option}='#{value}'"
+      end
+    end
+
+    system("bundle exec skeptic #{opts.join ' '} solutions/#{'%02d' % index}.rb") or exit(1)
   end
 end
