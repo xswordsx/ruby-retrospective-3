@@ -20,3 +20,9 @@ class Integer
   end
 
 end
+
+class Array
+  def average
+    reduce(:+) / length.to_f
+  end
+end
