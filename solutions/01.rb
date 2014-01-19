@@ -29,4 +29,8 @@ class Array
   def frequencies
     uniq.each_with_object({}) {|elem, hash| hash[elem] = count(elem)}
   end
+
+  def drop_every(n)
+    reject.with_index{|_, x| x.succ.remainder(n).zero?}
+  end
 end
