@@ -25,4 +25,8 @@ class Array
   def average
     reduce(:+) / length.to_f
   end
+
+  def frequencies
+    uniq.each_with_object({}) {|elem, hash| hash[elem] = count(elem)}
+  end
 end
