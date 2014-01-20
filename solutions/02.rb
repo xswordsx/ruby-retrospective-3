@@ -84,20 +84,23 @@ end
 
 
 class Criteria
-  @operator = :==
+  
+  def initialize(&procedure)
+    @procedure = &procedure
+  end
+
   class << self
     def status(status)
-      Proc.new {|obj| obj.status.send(@operator, status)}
+      -> (obj) {obj.status == status}
     end
 
     def priority(priority)
-      Proc.new {|obj| obj.priority.send(@operator, priority)}
+      -> (obj) {obj.priority == priority}
     end
 
     def tags(tags)
-      Proc.new {|obj| obj.tags.send(@operator, tags)}
+      -> (obj) {obj.tags & tags == tags}
     end
-
-
   end
+  
 end
