@@ -1,55 +1,44 @@
-module Constants
-  STATUS = {
-    "TODO"f => :todo,
-    "DONE"f => :done,
-    "CURRENT"f => :current
-    }.freeze
-
-  PRIORITY = {
-    "High"f => :high,
-    "Normal"f => :normal,
-    "Low"f => :low
-    }.freeze
-
-end
-
 class TodoList
 
-  def initialize(item_array)
-    @array = item_array.select {|elem| elem.kind_of? TodoItem}
+  attr_reader :task_list
+  def initialize(text)
+    @task_list = []
+    text.lines.each {|line| @task_list << parse(line)}
   end
 
   def each(&block)
-    @array.each {|x| yield x}
+    @task_list.each {|x| yield x}
   end
 
-  def TodoList.parse(todo_rows)
-    return_list = []
-    todo_rows.split("\n").each {|row| return_list << TodoItem.new(row.to_s)}
-    TodoList.new(return_list)
+  def TodoList.parse(line)
+    TodoItem.new(line.split('|').map(&:strip))
   end
 
   def filter(criteria)
   end
 
   def tasks_todo
-    @array.count {|x| x.status == :todo}
+    @task_list.count {|x| x.status == :todo}
   end
 
   def tasks_in_progress
-    @array.count {|x| x.status == :current}
+    @task_list.count {|x| x.status == :current}
   end
 
   def tasks_done
-    @array.count{|x| x.status == :done}
+    @task_list.count{|x| x.status == :done}
   end
 
   def completed?
-    @array.length == tasks_done
+    @task_list.length == tasks_done
   end
 
   def filter(criteria)
-    @array.select {|x| criteria.call(x)}
+    @task_list.select {|x| criteria.true_for?(x)}
+  end
+
+  def adjoin(other)
+    @task_list.dup.concat(other.tasks).uniq
   end
 
 end
@@ -57,50 +46,48 @@ end
 
 class TodoItem
 
-  attr_reader :tags
-  attr_reader :description
+  attr_reader :status, :description, :priority, :tags
 
-  def initialize(row)
-    stripped_list = []
-    row.split('|').each {|x| stripped_list << x.strip}
-
-    @status, @description, @priority, @tags = stripped_list
-    @tags = stripped_list.pop.split(',') if @tags
+  def initialize(*args)
+    @status, @description, @priority, @tags = *args
+    @tags = *args[-1].split(',')
+    @status, @priority = @status.downcase.to_sym, @priority.downcase.to_sym
   end
 
   def to_s
     "#{@status} | #{@description} | #{@priority} | #{@tags}"
   end
-
-  def status
-    Constants::STATUS[@status]
-  end
-
-  def priority
-    Constants::PRIORITY[@priority]
-  end
-
 end
 
 
 class Criteria
-  
   def initialize(&procedure)
-    @procedure = &procedure
+    @procedure = procedure
   end
 
   class << self
     def status(status)
-      -> (obj) {obj.status == status}
+      Criteria.new -> (obj) {obj.status == status}
     end
 
     def priority(priority)
-      -> (obj) {obj.priority == priority}
+      Criteria.new -> (obj) {obj.priority == priority}
     end
 
     def tags(tags)
-      -> (obj) {obj.tags & tags == tags}
+      Criteria.new -> (obj) {obj.tags & tags == tags}
     end
   end
-  
+
+  def true_for?(obj)
+    @procedure.call(obj)
+  end
+
+  def &(other)
+    Criteria.new -> (obj) {true_for?(obj) and obj.true_for?(other)}
+  end
+
+  def !
+    Criteria.new -> (obj) {not true_for?(obj)}
+  end
 end
